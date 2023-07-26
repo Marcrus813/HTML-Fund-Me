@@ -8,6 +8,8 @@
 
 Full stack -> Smart contracts (backend) + HTML(Front end)
 
+---
+
 ## Related concepts
 
 ### Plugins and browser
@@ -15,6 +17,8 @@ Full stack -> Smart contracts (backend) + HTML(Front end)
 Wallets add TOKEN(e.g. Ethereum) object `window.ethereum` to HTML source, we can use this to check whether the browser installed wallet or not
 
 > Wallets have a node connected to them, need to connect to node to interact with chain
+
+---
 
 ## Basic HTML
 
@@ -39,3 +43,12 @@ Fetch ABI from backend(etc., Other project)
 
 > Side note:
 > Getting `MetaMask RPC Error` related to nonce, need to reset account in MetaMask
+
+-   Problem
+    -   [ ] Node console keeps complaining about `NotEnoughETH`, even with enough ETH sent or even before pressing confirm, but txn passes, still to figure out why
+
+---
+
+## Event listening
+
+See code comment

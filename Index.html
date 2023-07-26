@@ -4,9 +4,19 @@
 		<title>Fund-Me App</title>
 	</head>
 	<body>
-		Hello!
-		<button id="btn_connect" onclick="connect()">Connect to wallet</button>
-        <button id="btn_fund" onclick="fund()">Fund</button>
+		Fund Me App!
+		<button id="btn_connect">Connect to wallet</button>
+
+		<button id="btn_balance">Check Balance</button>
+		<button id="btn_withdraw">Withdraw</button>
+
+        <button id="btn_fund">Fund</button>
+
+		<!--Form begin-->
+		<label for="fund">ETH Amount</label>
+		<input id="ethAmount" placeholder="0.1"/>
+		<!--Form end-->
+
 		<script src="./js/Index.js" type="module"></script> <!-- changing type to module allowing importing modules into code -->
 	</body>
 </html>

@@ -7,8 +7,12 @@ const metaMaskCheck = typeof window.ethereum !== "undefined";
 // In html change from `text/javascript` to `module`, so we need to do this, event bind
 const btn_connect = document.getElementById("btn_connect");
 const btn_fund = document.getElementById("btn_fund");
+const btn_balance = document.getElementById("btn_balance");
+const btn_withdraw = document.getElementById("btn_withdraw");
 btn_connect.onclick = connect;
 btn_fund.onclick = fund;
+btn_balance.onclick = getBalance;
+btn_withdraw.onclick = withdraw;
 
 async function connect() {
 	// Check MetaMask exist
@@ -27,8 +31,8 @@ async function connect() {
 }
 
 // Calling `fund`
-async function fund(ethAmount) {
-	console.log(`Funding with ${ethAmount}`);
+async function fund() {
+	const ethAmount = document.getElementById("ethAmount").value;
 	if (metaMaskCheck) {
 		/**
 		 * What do we need?
@@ -63,12 +67,64 @@ async function fund(ethAmount) {
 
 		try {
 			const txnResponse = await fundMe_contract.fund({
-				value: ethers.utils.parseEther("0.5"),
+				value: ethers.utils.parseEther(ethAmount),
 			});
+
+			// Listen for txn to be mined
+			// Listen for event(From contract)
+			await listenForTxnMine(txnResponse, provider);
+			console.log("Done");
 		} catch (error) {
 			console.log(error);
 		}
+	}
+}
 
-		
+async function getBalance() {
+	if (metaMaskCheck) {
+		const provider = new ethers.providers.Web3Provider(window.ethereum);
+		const balance = await provider.getBalance(fundMe_address);
+		console.log(ethers.utils.formatEther(balance));
+	}
+}
+
+// Not `async`, but use `promise`
+function listenForTxnMine(txnResponse, provider) {
+	console.log(`Mining ${txnResponse.hash}...`);
+	// Create a listener for the blockchain, and tells front end to wait for this to finish
+
+	// If this promise works correctly, call `resolve`, otherwise `reject`(Error or timeout[For learning no need, but for production in the future, defo])
+	return new Promise((resolve, reject) => {
+		provider.once(
+			// Run on its own process, so `listenForTxnMine` finishes before this call finishes, it runs `console.log("Done")` from above first, then comes back and check(Event loop), so to avoid this, we use promise
+			txnResponse.hash, //Once `provider` see this happens, trigger the function
+			(txnReceipt) => {
+				console.log(
+					`Completed with ${txnReceipt.confirmations} confirmations`
+				);
+				resolve(); // A promise is only returned once a `resolve` or a `reject` is called
+			}
+		);
+	});
+}
+
+async function withdraw() {
+	if (metaMaskCheck) {
+		console.log("Withdrawing...");
+		const provider = new ethers.providers.Web3Provider(window.ethereum);
+
+		const signer = provider.getSigner();
+		const fundMe_contract = new ethers.Contract(
+			fundMe_address,
+			fundMe_abi,
+			signer
+		);
+
+		try {
+			const txnResponse = await fundMe_contract.withdraw();
+			await listenForTxnMine(txnResponse, provider);
+		} catch (error) {
+			console.log(error);
+		}
 	}
 }
